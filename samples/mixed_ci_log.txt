@@ -1,0 +1,29 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-8.3.3
+collected 5 items
+
+tests/test_a.py::test_health ERROR
+tests/test_b.py::test_status_code FAILED
+tests/test_c.py::test_payload FAILED
+tests/test_d.py::test_wait FAILED
+
+==================================== ERRORS ====================================
+________________________ ERROR at setup of test_health _________________________
+E   ModuleNotFoundError: No module named 'httpx'
+=================================== FAILURES ===================================
+_____________________________ test_status_code _________________________________
+>       assert resp.status_code == 200
+E       AssertionError: assert 500 == 200
+E        +  where 500 = resp.status_code
+E       HTTPError: 500 Internal Server Error from upstream gateway
+_______________________________ test_payload ___________________________________
+E       IndexError: list index out of range
+E       (fixture data posts[] was empty — invalid test data from factory)
+_______________________________ test_wait ______________________________________
+E       TimeoutError: explicit wait exceeded for #submit
+E       possible race condition / timing issue under load
+=========================== short test summary info ============================
+ERROR tests/test_a.py::test_health
+FAILED tests/test_b.py::test_status_code
+FAILED tests/test_c.py::test_payload
+FAILED tests/test_d.py::test_wait

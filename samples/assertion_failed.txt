@@ -1,0 +1,21 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-8.3.3, pluggy-1.5.0
+collected 18 items
+
+tests/test_users_api.py::test_get_user_email_format FAILED               [ 22%]
+
+=================================== FAILURES ===================================
+_______________________ test_get_user_email_format _____________________________
+
+    def test_get_user_email_format(api_client):
+        resp = api_client.get("/users/1")
+        assert resp.status_code == 200
+        body = resp.json()
+>       assert "@" in body["email"]
+E       AssertionError: assert '@' in 'invalid-email-value'
+E       +  where 'invalid-email-value' = <built-in method __getitem__ of dict object at 0x7f9a>::__getitem__('email')
+
+tests/test_users_api.py:41: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_users_api.py::test_get_user_email_format - AssertionError
+============================== 1 failed in 0.18s ===============================

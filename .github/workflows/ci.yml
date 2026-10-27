@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: pip install -r requirements.txt
+      - name: Pytest
+        run: pytest -q
+      - name: Accuracy self-check
+        run: python -m failure_detective --self-check
+      - name: Demo report
+        run: |
+          python -m failure_detective samples/mixed_ci_log.txt --out out/
+          test -f out/report.html && test -f out/report.json

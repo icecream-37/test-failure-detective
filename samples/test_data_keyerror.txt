@@ -1,0 +1,21 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-8.3.3, pluggy-1.5.0
+collected 18 items
+
+tests/test_create_post.py::test_create_post_returns_id FAILED            [ 40%]
+
+=================================== FAILURES ===================================
+_____________________ test_create_post_returns_id ______________________________
+
+    def test_create_post_returns_id(api_client, post_payload):
+        # post_payload loaded from fixtures/posts.json
+        resp = api_client.post("/posts", json=post_payload)
+        assert resp.status_code in (200, 201)
+        data = resp.json()
+>       post_id = data["id"]
+E       KeyError: 'id'
+
+tests/test_create_post.py:28: KeyError
+=========================== short test summary info ============================
+FAILED tests/test_create_post.py::test_create_post_returns_id - KeyError: 'id'
+============================== 1 failed in 0.21s ===============================

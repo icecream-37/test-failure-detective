@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "failure-detective"
+version = "0.1.0"
+description = "Classify pytest/CI failure logs into environment / assertion / test_data / flaky_suspect"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "icecream-37" }]
+dependencies = [
+  "PyYAML>=6.0,<7",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+failure_detective = "failure_detective.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["failure_detective*"]
+
+[tool.setuptools.package-data]
+failure_detective = ["rules.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

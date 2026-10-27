@@ -1,0 +1,27 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-8.3.3, pluggy-1.5.0
+plugins: rerunfailures-14.0, flaky-3.8.1
+collected 18 items
+
+tests/test_ui_checkout.py::test_checkout_button_enabled FAILED           [ 70%]
+tests/test_ui_checkout.py::test_checkout_button_enabled PASSED           [ 70%]  (passed on rerun)
+
+=================================== FAILURES ===================================
+____________________ test_checkout_button_enabled (flaky) ______________________
+Rerun attempt 1 of 2 failed; passed on rerun.
+
+    def test_checkout_button_enabled(page):
+        page.goto("/cart")
+        # intermittent: animation / race condition with async price calc
+        import time
+        time.sleep(0.3)
+>       assert page.locator("#checkout").is_enabled()
+E       AssertionError: assert False
+E        +  where False = is_enabled()
+E       selenium.common.exceptions.ElementNotInteractableException: Message: element not interactable
+E       Hint: timing issue — button enabled only after price API returns
+
+This looks like an intermittent failure / flaky test under parallel workers.
+=========================== short test summary info ============================
+FLAKY tests/test_ui_checkout.py::test_checkout_button_enabled
+==================== 1 flaky, passed on rerun in 2.10s =========================

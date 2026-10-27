@@ -1,0 +1,156 @@
+# Rule pack for Test Failure Detective.
+# priority: higher wins when multiple patterns match the same failure block.
+# confidence: 0.0–1.0 (shown in reports; used for ordering within same priority).
+
+rules:
+  - id: env_connection_refused
+    category: environment
+    pattern: "ConnectionRefusedError|Connection refused|Errno 111"
+    flags: I
+    confidence: 0.95
+    priority: 100
+    suggestion_zh: 检查被测服务是否启动、端口是否监听、CI 服务依赖是否就绪。
+
+  - id: env_dns
+    category: environment
+    pattern: "NameResolutionError|nodename nor servname|getaddrinfo failed|Temporary failure in name resolution|Failed to resolve"
+    flags: I
+    confidence: 0.93
+    priority: 100
+    suggestion_zh: 检查 DNS / hosts、服务域名是否可解析，或改用稳定的 base URL。
+
+  - id: env_timeout_host
+    category: environment
+    pattern: "ConnectTimeout|ReadTimeout|Max retries exceeded|urllib3\\.exceptions\\.ConnectTimeoutError|Failed to establish a new connection"
+    flags: I
+    confidence: 0.88
+    priority: 90
+    suggestion_zh: 区分网络超时与断言超时：先 ping/curl 目标主机，再看用例 wait 是否过短。
+
+  - id: env_generic_timeout
+    category: environment
+    pattern: "TimeoutError|timed out(?:\\s+after)?"
+    flags: I
+    confidence: 0.72
+    priority: 55
+    suggestion_zh: 通用超时：先确认是否被测主机不可达；若是页面/元素等待，按 flaky/显式等待排查。
+
+  - id: env_http_5xx
+    category: environment
+    pattern: "\\b50[0-4]\\b.*(?:Internal Server Error|Bad Gateway|Service Unavailable|Gateway Timeout)|HTTPError.*(50[0-4])|status[_ ]?code[=:\\s]+50[0-4]"
+    flags: I
+    confidence: 0.85
+    priority: 85
+    suggestion_zh: 被测或依赖返回 5xx：查服务日志与发布窗口，勿先改断言。
+
+  - id: env_module_not_found
+    category: environment
+    pattern: "ModuleNotFoundError|No module named"
+    flags: I
+    confidence: 0.97
+    priority: 100
+    suggestion_zh: 补齐依赖：对照 requirements.txt / CI 安装步骤，确认虚拟环境是否激活。
+
+  - id: env_permission
+    category: environment
+    pattern: "PermissionError|Permission denied|Errno 13"
+    flags: I
+    confidence: 0.92
+    priority: 95
+    suggestion_zh: 检查文件/目录权限、CI 工作目录写权限、是否误写系统路径。
+
+  - id: env_file_not_found_config
+    category: environment
+    pattern: "FileNotFoundError:.*(?:config|\\.env|credentials|pytest\\.ini|tox\\.ini)"
+    flags: I
+    confidence: 0.8
+    priority: 80
+    suggestion_zh: 确认配置文件是否提交、CI checkout 路径是否正确。
+
+  - id: flaky_keyword
+    category: flaky_suspect
+    pattern: "\\bflaky\\b|flake8?n?ess|intermittent failure|偶尔失败|不稳定"
+    flags: I
+    confidence: 0.9
+    priority: 110
+    suggestion_zh: 标记为疑似 flaky：加 quarantine、查重试历史，再决定是否隔离用例。
+
+  - id: flaky_rerun
+    category: flaky_suspect
+    pattern: "Rerun|rerunfailures|passed on rerun|failed on attempt|flaky plugin|@pytest\\.mark\\.flaky"
+    flags: I
+    confidence: 0.87
+    priority: 105
+    suggestion_zh: 存在重试通过迹象：对比失败/通过两次的日志与时间差，查竞态或共享状态。
+
+  - id: flaky_race_timing
+    category: flaky_suspect
+    pattern: "race condition|timing issue|not yet available|ElementNotInteractable|StaleElementReference|could not be scrolled|animation.*not finished|time\\.sleep\\(|explicit wait.*exceeded"
+    flags: I
+    confidence: 0.78
+    priority: 96
+    suggestion_zh: 疑似时序/竞态：用显式等待替换 sleep，检查并行用例是否争用同一资源。
+
+  - id: data_fixture_error
+    category: test_data
+    pattern: "fixture ['\"]?\\w+['\"]? not found|Error getting value of argument|@pytest\\.fixture|FixtureLookupError|failed on setup|error during setup|SETUP ERROR"
+    flags: I
+    confidence: 0.9
+    priority: 88
+    suggestion_zh: 检查 fixture 名称、conftest 作用域、以及 setup 是否依赖外部数据文件。
+
+  - id: data_keyerror
+    category: test_data
+    pattern: "KeyError:\\s*['\"]?\\w+"
+    flags: I
+    confidence: 0.82
+    priority: 75
+    suggestion_zh: 响应或缺字段：先确认夹具/造数是否过期，再决定是改数据还是改断言。
+
+  - id: data_indexerror
+    category: test_data
+    pattern: "IndexError:\\s*(list index out of range|string index)"
+    flags: I
+    confidence: 0.8
+    priority: 75
+    suggestion_zh: 列表为空或长度与预期不符：检查造数脚本与接口返回条数。
+
+  - id: data_validation
+    category: test_data
+    pattern: "ValidationError|schema.*invalid|invalid test data|Parametrization.*failed|malformed.*payload|JSONDecodeError|Expecting value: line"
+    flags: I
+    confidence: 0.84
+    priority: 82
+    suggestion_zh: 测试输入或夹具 JSON 不合法：校验造数与 schema，勿直接改业务断言。
+
+  - id: data_value_missing
+    category: test_data
+    pattern: "ValueError:.*(?:missing|empty|required|fixture data|test data)"
+    flags: I
+    confidence: 0.75
+    priority: 72
+    suggestion_zh: 测试数据缺失或为空：检查 CSV/JSON 夹具路径与内容。
+
+  - id: assert_error
+    category: assertion
+    pattern: "AssertionError|assert\\s+.+\\s*[=!]=\\s*|assertion failed"
+    flags: I
+    confidence: 0.9
+    priority: 60
+    suggestion_zh: 对照 expected vs actual：确认是产品缺陷还是断言过严/过时。
+
+  - id: assert_expected_actual
+    category: assertion
+    pattern: "Expected[:\\s].*(?:Actual|but (?:was|got|received))|assert\\s+\\d+\\s*==\\s*\\d+|E\\s+assert\\s+"
+    flags: I
+    confidence: 0.88
+    priority: 65
+    suggestion_zh: 记录期望与实际差异，附请求/响应片段后再提单，避免只贴栈顶。
+
+  - id: assert_pytest_diff
+    category: assertion
+    pattern: "E\\s+-.*\\nE\\s+\\+|full diff:"
+    flags: "IM"
+    confidence: 0.86
+    priority: 63
+    suggestion_zh: 查看 pytest 差分：字段级差异优先对齐契约，再判断是否改用例。

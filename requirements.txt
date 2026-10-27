@@ -1,0 +1,5 @@
+# Runtime
+PyYAML>=6.0,<7
+
+# Dev / CI
+pytest>=8.0,<9
