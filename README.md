@@ -12,7 +12,7 @@
 | 一红就翻很长 log | 按失败块分诊 + 证据片段 |
 | 环境问题被当成用例烂 | `environment` 桶优先提示查服务/依赖 |
 | 只有口头结论 | `findings/` 模板把确认结果写成可跟踪记录 |
-| 「AI 说的」不好答辩 | 规则 `rule_id` 可解释，可 `--self-check` |
+| 黑盒结论难追溯 | 规则 `rule_id` 可解释，可 `--self-check` |
 
 ## 快速开始
 
@@ -29,7 +29,7 @@ pytest -q
 python -m failure_detective samples/env_connection_refused.txt --out out/
 # 打开 out/report.html
 
-# 标注样本准确率（面试可演示）
+# 标注样本准确率自检
 python -m failure_detective --self-check
 
 # 分类 + 生成 findings 草稿
@@ -62,7 +62,7 @@ python -m failure_detective samples/mixed_ci_log.txt --out out/ \
 3. 对确认的问题：用 [`findings/FINDING_TEMPLATE.md`](findings/FINDING_TEMPLATE.md)，或 `--emit-finding-stub`  
 4. 填「人工结论 / 复现 / 建议」，更新状态  
 
-示例归档（可作面试投屏）：
+示例归档：
 
 - [`findings/F-20261027-01_posts-api-connection.md`](findings/F-20261027-01_posts-api-connection.md) — 环境  
 - [`findings/F-20261027-02_user-email-assertion.md`](findings/F-20261027-02_user-email-assertion.md) — 断言  
@@ -70,13 +70,13 @@ python -m failure_detective samples/mixed_ci_log.txt --out out/ \
 
 详见 [`findings/README.md`](findings/README.md)。
 
-## 人工抽检准确率怎么讲
+## 准确率自检
 
 1. 维护少量**已标注**样例（`samples/` + `failure_detective/accuracy.py`）  
-2. `python -m failure_detective --self-check` 看命中率  
+2. `python -m failure_detective --self-check` 查看命中率  
 3. 误报：在 finding 里纠正分类，并改 `rules.yaml`，再跑 `pytest` 防回归  
 
-面试话术：工具负责降噪；**我负责抽检和归档**——采纳/纠正都会留在 findings 里。
+工具负责初筛与降噪；**人工抽检与 findings 归档**才是最终结论——采纳或纠正都会留在 `findings/` 中。
 
 ## 限制
 
@@ -93,7 +93,6 @@ samples/               # 演示用失败日志
 tests/                 # 分类器自测
 findings/              # 模板 + 示例发现（测试产出）
 docs/design.md
-面试口述稿.md
 ```
 
 ## 许可证

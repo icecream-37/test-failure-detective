@@ -62,7 +62,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument(
         "--self-check",
         action="store_true",
-        help="对 samples/ 标注样本做准确率自检并打印结果（面试可演示）",
+        help="对 samples/ 标注样本做准确率自检并打印结果",
     )
     p.add_argument(
         "--samples-dir",
