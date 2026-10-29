@@ -13,7 +13,7 @@ CI / 本地 pytest 一红，值班要在「环境挂了、断言真失败、数�
 | 点 | 说明 |
 |----|------|
 | 可演示、可 CI | 无 Key、无网络也能跑；pytest 能锁住行为 |
-| 可解释 | 每条命中 `rule_id` + evidence，面试官问得清 |
+| 可解释 | 每条命中 `rule_id` + evidence，便于对照说明命中原因 |
 | 误报可修 | 改 `rules.yaml` 即可迭代，不靠「再试一次 prompt」 |
 | 成本 | 学生/小团队零推理费用 |
 
@@ -42,9 +42,9 @@ log.txt → 切分失败块 → rules.yaml 匹配（priority, confidence）
 ## 与兄弟项目的关系
 
 [api-regression-jsonplaceholder](https://github.com/icecream-37/api-regression-jsonplaceholder) 负责「把接口测绿 + AI 用例评审」。  
-本仓库负责「红了以后怎么分诊并归档」。故事线：造用例 → 跑 CI → 失败分诊 → findings。
+本仓库负责「红了以后怎么分诊并归档」。典型链路：编写用例 → 跑 CI → 失败分诊 → 写入 findings。
 
-## 可选后续（未实现，可口述）
+## 可选后续（未实现）
 
 - 第二遍 LLM hook：仅处理 `unknown`  
 - 解析 JUnit XML / GitHub Actions annotation  
